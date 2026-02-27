@@ -27,7 +27,8 @@
     pkgs.nodejs_20
     pkgs.pandoc
     pkgs.code-cursor
-    pkgs.nh
+    pkgs.podman
+    pkgs.podman-compose
 
     # Apps / services
     pkgs.opencode
@@ -40,6 +41,7 @@
 
     # Physics / HEP
     pkgs.lhapdf
+    pkgs.nnlojet
 
     # Shell / terminal
     pkgs.zellij
@@ -48,9 +50,21 @@
 
     # GUI / other
     pkgs.firefox
+    pkgs.thunderbird-bin
     pkgs.texliveFull
     pkgs.root
   ];
+
+  # ── nh (Nix helper) ───────────────────────────────────────────────────────
+  programs.nh = {
+    enable = true;
+    darwinFlake = "~/nix";
+    clean = {
+      enable = true;
+      dates = "weekly";
+      extraArgs = "--keep 5 --keep-since 3d";
+    };
+  };
 
   # ── Managed files ─────────────────────────────────────────────────────────
   # ~/.p10k.zsh is a read-only symlink to the nix store.
@@ -91,7 +105,6 @@
 
     shellAliases = {
       nixu = "nix flake update --flake ~/nix";
-      nixb = "nh darwin switch ~/nix";
       nixe = "nvim ~/nix/darwin.nix";
       pip  = "pip3";
     };
@@ -120,6 +133,7 @@
         # Shell functions (nixd stays with nix — nh has no develop equivalent)
         nixs() { nh search "''${1:-default}"; }
         nixd() { nix develop ~/nix#"''${1:-default}"; }
+        nixb() { nh darwin switch ~/nix "$@"; }
 
         # Research environment — sourced conditionally since paths are local installs
 
@@ -127,10 +141,6 @@
         command -v alienv &>/dev/null && eval "$(alienv shell-helper)"
 
         export PATH="/Users/florianjonas/Library/Python/3.9/bin:$PATH"
-        export PATH="/Users/florianjonas/analysis/fastjet-3.3.4/build/bin:$PATH"
-        export PATH="/Users/florianjonas/analysis/nnlojet-v1.0.2/install/bin:$PATH"
-        [[ -f "/Users/florianjonas/analysis/nnlojet-v1.0.2/install/share/nnlojet-completion.sh" ]] && \
-          source "/Users/florianjonas/analysis/nnlojet-v1.0.2/install/share/nnlojet-completion.sh"
 
         # Secrets (not managed by nix — keep out of git)
         [[ -f ~/.zshrc.secrets ]] && source ~/.zshrc.secrets

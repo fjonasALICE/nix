@@ -9,9 +9,25 @@
   # Allow unfree packages (e.g. some fonts, drivers)
   nixpkgs.config.allowUnfree = true;
 
+  # Custom packages (e.g. NNLOJET) — not in nixpkgs
+  nixpkgs.overlays = [
+    (self: super: {
+      nnlojet = super.callPackage ./custompackages/nnlojet/default.nix { };
+    })
+  ];
+
   # Determinate Nix manages its own daemon — disable nix-darwin's Nix management
   # to avoid conflicts. Flakes/nix-command are already enabled by Determinate.
+  # See: https://docs.determinate.systems/guides/nix-darwin/
   nix.enable = false;
+
+  # Determinate Nix custom configuration
+  # This writes to /etc/nix/nix.custom.conf which is included by Determinate's main config.
+  # See: https://docs.determinate.systems/determinate-nix/#determinate-nix-configuration
+  environment.etc."nix/nix.custom.conf".text = ''
+    # Use all available CPU cores for parallel compilation within each build
+    cores = 14
+  '';
 
   # ── macOS defaults ────────────────────────────────────────────────────────
   # system.primaryUser is required for user-scoped defaults (dock, finder, etc.)
