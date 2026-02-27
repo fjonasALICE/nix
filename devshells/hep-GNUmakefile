@@ -1,0 +1,23 @@
+# HEP dev-shell generic Makefile
+# Paths are injected as env vars by the nix devshell (nix develop ~/nix#hep).
+# make reads this automatically via the MAKEFILES env var, so no local
+# Makefile is needed:  make foo  →  compiles foo.cc → ./foo
+
+CXX      := $(HEP_CXX)
+CXXFLAGS := -O2 -std=c++17 -fPIC -pthread
+
+HEP_CFLAGS := \
+  -I$(HEP_PYTHIA)/include \
+  -I$(HEP_FASTJET)/include \
+  -I$(HEP_LHAPDF)/include \
+  $(shell $(HEP_ROOT)/bin/root-config --cflags)
+
+HEP_LIBS := \
+  -L$(HEP_PYTHIA)/lib  -Wl,-rpath,$(HEP_PYTHIA)/lib  -lpythia8 -ldl \
+  -L$(HEP_FASTJET)/lib -Wl,-rpath,$(HEP_FASTJET)/lib -lfastjet \
+  -L$(HEP_LHAPDF)/lib  -Wl,-rpath,$(HEP_LHAPDF)/lib  -lLHAPDF \
+  $(shell $(HEP_ROOT)/bin/root-config --glibs)
+
+# Generic rule: `make foo` compiles foo.cc → ./foo
+%: %.cc
+	$(CXX) $(CXXFLAGS) $(HEP_CFLAGS) $< -o $@ $(HEP_LIBS)
