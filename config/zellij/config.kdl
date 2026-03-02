@@ -306,10 +306,8 @@ theme "dracula"
  
 // The name of the default layout to load on startup
 // Default: "default"
-// Start Zellij in the welcome screen, which then lets you
-// create/attach/resurrect sessions before dropping into
-// your usual layout with status bar + keybinding help.
-default_layout "welcome"
+// Using custom layout with zjstatus fancy status bar
+default_layout "default"
  
 // The folder in which Zellij will look for layouts
 // (Requires restart)

@@ -62,11 +62,16 @@
     brews = [
       "alisw/system-deps/alibuild"
       "alisw/system-deps/o2-full-deps"
+      "mas"
     ];
     casks = [
       "iterm2"
       "kopiaui"
     ];
+
+    masApps = {
+      "Mattermost Desktop" = 1614666244;
+    };
   };
 
   # ── Platform ──────────────────────────────────────────────────────────────

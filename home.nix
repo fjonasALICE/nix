@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }: {
+{ pkgs, lib, config, ... }: {
 
   home.username    = "florianjonas";
   home.homeDirectory = "/Users/florianjonas";
@@ -58,7 +58,7 @@
   # ── nh (Nix helper) ───────────────────────────────────────────────────────
   programs.nh = {
     enable = true;
-    darwinFlake = "~/nix";
+    darwinFlake = "${config.home.homeDirectory}/nix";
     clean = {
       enable = true;
       dates = "weekly";
@@ -91,6 +91,12 @@
       url = "https://github.com/dj95/zjstatus/releases/download/v0.22.0/zjstatus.wasm";
       sha256 = "0lyxah0pzgw57wbrvfz2y0bjrna9bgmsw9z9f898dgqw1g92dr2d";
     };
+
+  # Zellij layout with zjstatus
+  xdg.configFile."zellij/layouts/default.kdl" = {
+    source = ./config/zellij/layouts/default.kdl;
+    force = true;
+  };
 
   # ── Zsh ───────────────────────────────────────────────────────────────────
   programs.zsh = {
@@ -132,15 +138,15 @@
       (lib.mkAfter ''
         # Shell functions (nixd stays with nix — nh has no develop equivalent)
         nixs() { nh search "''${1:-default}"; }
-        nixd() { nix develop ~/nix#"''${1:-default}"; }
-        nixb() { nh darwin switch ~/nix "$@"; }
+        nixd() { nix develop ${config.home.homeDirectory}/nix#"''${1:-default}"; }
+        nixb() { nh darwin switch ${config.home.homeDirectory}/nix "$@"; }
 
         # Research environment — sourced conditionally since paths are local installs
 
         export ALIBUILD_WORK_DIR="$HOME/alice/sw"
         command -v alienv &>/dev/null && eval "$(alienv shell-helper)"
 
-        export PATH="/Users/florianjonas/Library/Python/3.9/bin:$PATH"
+        export PATH="${config.home.homeDirectory}/Library/Python/3.9/bin:$PATH"
 
         # Secrets (not managed by nix — keep out of git)
         [[ -f ~/.zshrc.secrets ]] && source ~/.zshrc.secrets
