@@ -25,7 +25,7 @@
       system = "aarch64-darwin";
       pkgs   = nixpkgs.legacyPackages.${system};
     in {
-      darwinConfigurations."Florians-MacBook-Pro-3" = nix-darwin.lib.darwinSystem {
+      darwinConfigurations."florianjonas-mbp-cern" = nix-darwin.lib.darwinSystem {
         inherit system;
         modules = [
           ./darwin.nix
@@ -41,6 +41,7 @@
 
       devShells.${system} = {
         hep = import ./devshells/hep.nix { inherit pkgs; };
+        "hep-python" = import ./devshells/hep-python.nix { inherit pkgs; };
       };
     };
 }

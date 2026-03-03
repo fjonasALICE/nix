@@ -28,6 +28,7 @@
     pkgs.pandoc
     pkgs.code-cursor
     pkgs.podman
+    pkgs.podman-desktop
     pkgs.podman-compose
 
     # Apps / services
@@ -54,6 +55,19 @@
     pkgs.texliveFull
     pkgs.root
   ];
+
+  # ── LHAPDF PDF sets download───────────────────────────────────────────────
+  # Runs after every rebuild; the download script skips already-present files.
+  home.activation.downloadLhapdfSets = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    pdf_dir="${config.home.homeDirectory}/pdfs"
+    $DRY_RUN_CMD mkdir -p "$pdf_dir"
+    for prefix in EPPS21 TUJU21 nNNPDF30 CT18 nCTEQ15; do
+      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 \
+        "${config.home.homeDirectory}/nix/helperscripts/downloadpdfs.py" \
+        "$prefix" --output-dir "$pdf_dir" \
+        || true
+    done
+  '';
 
   # ── nh (Nix helper) ───────────────────────────────────────────────────────
   programs.nh = {
@@ -122,6 +136,7 @@
         { name = "zsh-users/zsh-autosuggestions"; }
         { name = "zsh-users/zsh-syntax-highlighting"; }
         { name = "fdellwing/zsh-bat"; }
+        { name = "plugins/eza"; tags = [ "from:oh-my-zsh" ]; }
         { name = "plugins/git"; tags = [ "from:oh-my-zsh" ]; }
       ];
     };
@@ -147,6 +162,8 @@
         command -v alienv &>/dev/null && eval "$(alienv shell-helper)"
 
         export PATH="${config.home.homeDirectory}/Library/Python/3.9/bin:$PATH"
+
+        export LHAPDF_DATA_PATH="''${LHAPDF_DATA_PATH:+''${LHAPDF_DATA_PATH}:}$HOME/pdfs"
 
         # Secrets (not managed by nix — keep out of git)
         [[ -f ~/.zshrc.secrets ]] && source ~/.zshrc.secrets
