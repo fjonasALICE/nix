@@ -1,4 +1,9 @@
-{ pkgs, lib, config, ... }: {
+{ pkgs, lib, config, ... }:
+let
+  aliBuildDeps = import ./custompackages/alibuildtools/alibuilddeps.nix { inherit pkgs; };
+  pythonWithRich = pkgs.python3.withPackages (ps: [ ps.rich ]);
+in
+{
 
   home.username    = "florianjonas";
   home.homeDirectory = "/Users/florianjonas";
@@ -54,6 +59,11 @@
     pkgs.thunderbird-bin
     pkgs.texliveFull
     pkgs.root
+
+    pkgs.alibuild
+    pkgs.openssl
+
+    aliBuildDeps #custom packages for aliBuild
   ];
 
   # ── LHAPDF PDF sets download───────────────────────────────────────────────
@@ -62,12 +72,15 @@
     pdf_dir="${config.home.homeDirectory}/pdfs"
     $DRY_RUN_CMD mkdir -p "$pdf_dir"
     for prefix in EPPS21 TUJU21 nNNPDF30 CT18 nCTEQ15; do
-      $DRY_RUN_CMD ${pkgs.python3}/bin/python3 \
+      $DRY_RUN_CMD ${pythonWithRich}/bin/python3 \
         "${config.home.homeDirectory}/nix/helperscripts/downloadpdfs.py" \
         "$prefix" --output-dir "$pdf_dir" \
         || true
     done
   '';
+
+
+  
 
   # ── nh (Nix helper) ───────────────────────────────────────────────────────
   programs.nh = {

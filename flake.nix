@@ -42,6 +42,7 @@
       devShells.${system} = {
         hep = import ./devshells/hep.nix { inherit pkgs; };
         "hep-python" = import ./devshells/hep-python.nix { inherit pkgs; };
+        "python-hep" = import ./devshells/python-hep.nix { inherit pkgs; };
       };
     };
 }

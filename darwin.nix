@@ -1,5 +1,9 @@
 { pkgs, ... }: {
 
+  imports = [
+    ./modules/cvmfs.nix
+  ];
+
   # ── PATH ──────────────────────────────────────────────────────────────────
   # nix-darwin hard-codes PATH in set-environment, bypassing macOS path_helper.
   # Re-add Homebrew paths that path_helper would have included via /etc/paths.d.
@@ -60,8 +64,6 @@
     enable = true;
     onActivation.cleanup = "zap";
     brews = [
-      "alisw/system-deps/alibuild"
-      "alisw/system-deps/o2-full-deps"
       "mas"
     ];
     casks = [
